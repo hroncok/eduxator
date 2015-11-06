@@ -1,0 +1,9 @@
+dependencies: []
+devassistant_version: 0.12.0a1
+original_kwargs:
+  github: hroncok
+  name: eduxator
+  venv: ''
+project_type:
+- python
+- lib

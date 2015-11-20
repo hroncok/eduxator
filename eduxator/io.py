@@ -16,7 +16,7 @@ class EduxIO:
     def __init__(self, *, cookie_file=None, cookie_dict=None):
         if cookie_file and cookie_dict:
             raise ValueError('cookie_file and cookie_dict cannot be used at teh same time')
-        if cookie_dict:
+        if cookie_dict is not None:
             self.cookies = cookie_dict
         else:
             cookie_file = cookie_file or COOKIE

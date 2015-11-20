@@ -1,3 +1,4 @@
+import re
 import os
 
 from lxml import etree
@@ -5,7 +6,8 @@ import requests
 
 
 COOKIE = '~/.edux.cookie'
-POST = 'https://edux.fit.cvut.cz/courses/BI-3DT/classification/view/fulltime/tutorials/3'
+EDUX = 'https://edux.fit.cvut.cz/'
+POST = EDUX + 'courses/BI-3DT/classification/view/fulltime/tutorials/3'
 GET = POST + '?do=edit'
 
 
@@ -53,6 +55,11 @@ class EduxIO:
 
     def post(self, url, data):
         return requests.post(url, data, cookies=self.cookies)
+
+    def parse_courses_list(self):
+        r = requests.get(EDUX)  # do not use our get method, simply grab it without cookies
+        return tuple(x[len('courses/'):] for x in set(re.findall(r'courses/[^<"]*', r.text))
+                     if not x.endswith('KOD-PREDMETU'))
 
     def parse_form_edit_score(self, url=GET):
         r = self.get(url)

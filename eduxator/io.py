@@ -39,6 +39,12 @@ class EduxIO:
             cookies[parts[0]] = parts[1].rstrip()
         return cookies
 
+    def save_cookie(self, path=COOKIE):
+        with open(os.path.expanduser(path), 'w') as f:
+            for name in self.cookies:
+                f.write(name + '=' + self.cookies[name] + '\n')
+                break
+
     def get(self, url):
         r = requests.get(url, cookies=self.cookies)
         self.cookies = r.cookies.get_dict()

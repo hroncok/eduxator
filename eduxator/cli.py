@@ -7,6 +7,9 @@ from eduxator import io
 class CLI:
     def __init__(self):
         self.prompt = '> '
+        self.cookie_setup()
+
+    def cookie_setup(self):
         try:
             self.eduxio = io.EduxIO()
         except ValueError as ve:
@@ -17,11 +20,10 @@ class CLI:
             cookie_value = self.ask('Enter the cookie\'s value')
             self.eduxio = io.EduxIO(cookie_dict={cookie_name: cookie_value})
 
-            save = self.ask_bool('Good, I feel your anger. Should I save this to ~./.edux.cookie '
-                                 'to save you some pain later?')
-            # TODO save cookie to file, possibly implement in EduxIO
-            if save:
+            if self.ask_bool('Good, I feel your anger. Should I save this to ~./.edux.cookie '
+                             'to save you some pain later?'):
                 self.info('Saving.')
+                self.eduxio.save_cookie()
 
     def exit(self):
         sys.exit(0)

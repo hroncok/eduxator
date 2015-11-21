@@ -38,6 +38,21 @@ class TestEduxIO():
         assert e.course == 'BI-3DT'
         assert e.classpath == ('fulltime', 'tutorials', '3')
 
+    @pytest.mark.parametrize('argument', (True, False))
+    def test_sending_form(self, argument):
+        url = 'https://edux.fit.cvut.cz/courses/BI-3DT/classification/view/fulltime/tutorials/3'
+        flexmock(io.EduxIO).should_receive('post').with_args(url, {}).once()
+        e = io.EduxIO(cookie_dict={})
+        if argument:
+            e.submit_form_edit_score({}, course='BI-3DT',
+                                     classpath=('fulltime', 'tutorials', '3'))
+        else:
+            e.course = 'BI-3DT'
+            e.classpath = ('fulltime', 'tutorials', '3')
+            e.submit_form_edit_score({})
+        assert e.course == 'BI-3DT'
+        assert e.classpath == ('fulltime', 'tutorials', '3')
+
     def test_parsing_courses(self):
         flexmock(requests).should_receive('get').once().and_return(self.fake_response('courses'))
         e = io.EduxIO(cookie_dict={})

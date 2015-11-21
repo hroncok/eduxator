@@ -3,8 +3,12 @@ python:
 - '3.3'
 - '3.4'
 - '3.5'
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/virtualenv/python$TRAVIS_PYTHON_VERSION/lib/python$TRAVIS_PYTHON_VERSION/site-packages
 install:
-- pip install -r requirements.txt
-- pip install -r requirements-testing.txt
+- pip install --upgrade -r requirements.txt
+- pip install --upgrade -r requirements-testing.txt
 script:
 - py.test -v

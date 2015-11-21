@@ -24,13 +24,13 @@ class EduxIO:
         else:
             cookie_file = cookie_file or COOKIE
             try:
-                self.cookies = self._cookie_from_file(cookie_file)
+                self.cookies = self.cookie_from_file(cookie_file)
             except Exception as e:
                 raise ValueError('File {} probably does not contain a '
                                  'cookie in name=value syntax'.format(cookie_file)) from e
 
     @classmethod
-    def _cookie_from_file(cls, path):
+    def cookie_from_file(cls, path):
         with open(os.path.expanduser(path)) as f:
             lines = f.readlines()
         cookies = {}
@@ -58,6 +58,9 @@ class EduxIO:
         return requests.post(url, data, cookies=self.cookies)
 
     def parse_courses_list(self):
+        '''
+        Returns all available courses from Edux
+        '''
         r = requests.get(EDUX)  # do not use our get method, simply grab it without cookies
         return tuple(x[len(COURSES):] for x in set(re.findall(COURSES + r'[^<"]*', r.text))
                      if not x.endswith('KOD-PREDMETU'))
@@ -73,12 +76,7 @@ class EduxIO:
 
         Returns a weird dict-based tree where leaves contains empty dicts
         '''
-        if hasattr(self, 'course'):
-            course = course or self.course
-        elif course is None:
-            raise AttributeError('Neither course attribute or course argument was provided')
-        else:
-            self.course = course
+        course = self.use_course(course)
 
         classification = EDUX + COURSES + course + CLASSIFICATION
         r = self.get(classification + 'start')
@@ -95,7 +93,40 @@ class EduxIO:
                 walk = walk[part]
         return tree
 
-    def parse_form_edit_score(self, url):
+    def use_course(self, course):
+        if hasattr(self, 'course'):
+            return course or self.course
+        elif course is None:
+            raise AttributeError('Neither course attribute or course argument was provided')
+        self.course = course
+        return course
+
+    def use_classpath(self, classpath):
+        if hasattr(self, 'classpath'):
+            return classpath or self.classpath
+        elif classpath is None:
+            raise AttributeError('Neither classpath attribute or classpath argument was provided')
+        self.classpath = classpath
+        return classpath
+
+    def construct_form_url(self, course, classpath, *, edit=False):
+        course = self.use_course(course)
+        classpath = self.use_classpath(classpath)
+        extra = EDIT if edit else ''
+        return EDUX + COURSES + course + CLASSIFICATION + '/'.join(classpath) + extra
+
+    def parse_form_edit_score(self, *, course=None, classpath=None):
+        '''
+        Parse the classification form
+
+        course behaves the same as in parse_classification_tree()
+        classpath behaves the same as course
+
+        classpath is supposed to be list of strings
+
+        Returns a dict of all current values
+        '''
+        url = self.construct_form_url(course, classpath, edit=True)
         r = self.get(url)
         tree = etree.HTML(r.text)
         scores_form = None
@@ -112,5 +143,6 @@ class EduxIO:
         values.pop(None, None)  # Remove bogus value, such as 'nastavit svislý posun'
         return values
 
-    def submit_form_edit_score(self, data, url):
+    def submit_form_edit_score(self, data, *, course=None, classpath=None):
+        url = self.construct_form_url(course, classpath)
         return self.post(url, data)

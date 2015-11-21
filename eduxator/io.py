@@ -7,8 +7,9 @@ import requests
 
 COOKIE = '~/.edux.cookie'
 EDUX = 'https://edux.fit.cvut.cz/'
-POST = EDUX + 'courses/BI-3DT/classification/view/fulltime/tutorials/3'
-GET = POST + '?do=edit'
+COURSES = 'courses/'
+CLASSIFICATION = '/classification/view/'
+EDIT = '?do=edit'
 
 
 class EduxIO:
@@ -58,10 +59,43 @@ class EduxIO:
 
     def parse_courses_list(self):
         r = requests.get(EDUX)  # do not use our get method, simply grab it without cookies
-        return tuple(x[len('courses/'):] for x in set(re.findall(r'courses/[^<"]*', r.text))
+        return tuple(x[len(COURSES):] for x in set(re.findall(COURSES + r'[^<"]*', r.text))
                      if not x.endswith('KOD-PREDMETU'))
 
-    def parse_form_edit_score(self, url=GET):
+    def parse_classification_tree(self, course=None):
+        '''
+        Parse all classification types for our course
+
+        If course is not provided, tries to use self.course
+        If course is provided and self.course was not set, it sets it
+        If course is provided and self.course was set, it uses course and preserves self.course
+        If neither course or self.course is provided/set, it blows up
+
+        Returns a weird dict-based tree where leaves contains empty dicts
+        '''
+        if hasattr(self, 'course'):
+            course = course or self.course
+        elif course is None:
+            raise AttributeError('Neither course attribute or course argument was provided')
+        else:
+            self.course = course
+
+        classification = EDUX + COURSES + course + CLASSIFICATION
+        r = self.get(classification + 'start')
+        strings = tuple(x[len(classification):] for x in
+                        set(re.findall(classification + r'[^ <"\?#]*', r.text))
+                        if not x.startswith(classification + 'start') and not x.endswith('start'))
+
+        tree = {}
+        for string in strings:
+            walk = tree
+            for part in string.split('/'):
+                if part not in walk:
+                    walk[part] = {}
+                walk = walk[part]
+        return tree
+
+    def parse_form_edit_score(self, url):
         r = self.get(url)
         tree = etree.HTML(r.text)
         scores_form = None
@@ -78,5 +112,5 @@ class EduxIO:
         values.pop(None, None)  # Remove bogus value, such as 'nastavit svislý posun'
         return values
 
-    def submit_form_edit_score(self, data, url=POST):
+    def submit_form_edit_score(self, data, url):
         return self.post(url, data)

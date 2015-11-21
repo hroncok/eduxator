@@ -1,5 +1,6 @@
 import json
 
+import pytest
 import requests
 from flexmock import flexmock
 
@@ -29,3 +30,17 @@ class TestEduxIO():
         flexmock(requests).should_receive('get').once().and_return(self.fake_response('courses'))
         e = io.EduxIO(cookie_dict={})
         assert sorted(self.good_data('courses')) == sorted(e.parse_courses_list())
+
+    @pytest.mark.parametrize('argument', (True, False))
+    def test_parsing_calssification(self, argument):
+        url = 'https://edux.fit.cvut.cz/courses/BI-3DT/classification/view/start'
+        flexmock(io.EduxIO).should_receive('get').with_args(url).once().and_return(
+            self.fake_response('classification'))
+        e = io.EduxIO(cookie_dict={})
+        if argument:
+            tree = e.parse_classification_tree('BI-3DT')
+        else:
+            e.course = 'BI-3DT'
+            tree = e.parse_classification_tree()
+        assert e.course == 'BI-3DT'
+        assert tree == self.good_data('classification')

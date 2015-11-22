@@ -6,9 +6,8 @@ from eduxator import io
 
 
 class CLI:
-    prompt = '> '
-
     def __init__(self):
+        self.prompt = '> '
         self.readline_setup()
         self.cookie_setup()
         self.context_setup()
@@ -43,6 +42,7 @@ class CLI:
         self.eduxio.course = self.determine_course(args)
         self.eduxio.classpath = self.determine_classpath(args)
         self.column = self.determine_column(args)
+        self.prompt = '[{}]> '.format(self.column)
 
     def find_candidates(self, args, possibilities, case_sentitive=False):
         if len(possibilities) == 1:

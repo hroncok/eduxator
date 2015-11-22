@@ -1,3 +1,4 @@
+import os
 import readline
 import sys
 
@@ -5,10 +6,20 @@ from eduxator import io
 
 
 class CLI:
+    prompt = '> '
+
     def __init__(self):
-        self.prompt = '> '
+        self.history_setup()
         self.cookie_setup()
         self.context_setup()
+        self.exit()
+
+    def history_setup(self):
+        self.histfile = os.path.join(os.path.expanduser('~'), '.eduxator_history')
+        try:
+            readline.read_history_file(self.histfile)
+        except FileNotFoundError:
+            pass
 
     def cookie_setup(self):
         try:
@@ -95,6 +106,7 @@ class CLI:
         return classpath
 
     def exit(self):
+        readline.write_history_file(self.histfile)
         sys.exit(0)
 
     def say(self, msg):

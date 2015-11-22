@@ -2,6 +2,8 @@ import os
 import readline
 import sys
 
+import colorama
+
 from eduxator import io
 
 
@@ -113,16 +115,22 @@ class CLI:
         sys.exit(0)
 
     def say(self, msg):
-        return print(str(msg))  # for now
+        return print(msg)
 
     def info(self, msg):
-        return self.say(msg)  # for now
+        return self.say(str(msg))
+
+    def question(self, msg):
+        return self.say(colorama.Fore.GREEN + colorama.Style.BRIGHT +
+                        str(msg) + colorama.Style.RESET_ALL)
 
     def warn(self, msg):
-        return self.say(msg)  # for now
+        return self.say(colorama.Fore.YELLOW + colorama.Style.BRIGHT +
+                        str(msg) + colorama.Style.RESET_ALL)
 
     def error(self, msg):
-        return self.say(msg)  # for now
+        return self.say(colorama.Fore.RED + colorama.Style.BRIGHT +
+                        str(msg) + colorama.Style.RESET_ALL)
 
     def possibilities_list(self, possibilities):
         if possibilities:
@@ -140,7 +148,7 @@ class CLI:
 
     def ask(self, question, possibilities=None):
         plist = self.possibilities_list(possibilities)
-        self.say(question + plist)
+        self.question(question + plist)
         if possibilities:
             def completer(text, state):
                 return [x for x in possibilities if x.upper().startswith(text.upper())][state] + ' '
@@ -159,7 +167,7 @@ class CLI:
 
     def ask_bool(self, question):
         plist = self.possibilities_list(['Y', 'n'])
-        self.say(question + plist)
+        self.question(question + plist)
         readline.set_completer(None)
         try:
             ret = self.input()

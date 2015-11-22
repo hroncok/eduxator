@@ -30,6 +30,7 @@ class CLI:
         args = list(set(sys.argv[1:]))
         self.eduxio.course = self.determine_course(args)
         self.eduxio.classpath = self.determine_classpath(args)
+        self.column = self.determine_column(args)
 
     def find_candidates(self, args, possibilities, case_sentitive=False):
         if len(possibilities) == 1:
@@ -62,6 +63,17 @@ class CLI:
         if len(candidates) > 1:
             self.warn('Found multiple possible courses.')
             return self.ask('What course do you want?', candidates)
+        return candidates[0]
+
+    def determine_column(self, args):
+        data = self.eduxio.parse_form_edit_score()
+        columns = self.eduxio.all_columns(data)
+        candidates = self.find_candidates(args, columns)
+        if not candidates:
+            return self.ask('What column do you want?', columns)
+        if len(candidates) > 1:
+            self.warn('Found multiple possible columns.')
+            return self.ask('What column do you want?', candidates)
         return candidates[0]
 
     def determine_classpath(self, args):

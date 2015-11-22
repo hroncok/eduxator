@@ -71,6 +71,13 @@ class EduxIO:
         return tuple(x[len(COURSES):] for x in set(re.findall(COURSES + r'[^<"]*', r.text))
                      if not x.endswith('KOD-PREDMETU'))
 
+    def course_from_url(self, url):
+        '''
+        Parses the course name form URL
+        This is needed bacuase some sourses, such as BI-3DT.1, only redirects (e.g. to BI-3DT)
+        '''
+        return url.split('/')[4]  # ['https:', '', 'edux.fit.cvut.cz', 'courses', 'HERE'...
+
     def parse_classification_tree(self):
         '''
         Parse all classification types for our course
@@ -83,6 +90,7 @@ class EduxIO:
 
         classification = EDUX + COURSES + self.course + CLASSIFICATION
         r = self.get(classification + 'start')
+        self.course = self.course_from_url(r.url)
         # link is HTML are without EDUX address
         classification = '/' + COURSES + self.course + CLASSIFICATION
         strings = tuple(x[len(classification):] for x in

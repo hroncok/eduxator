@@ -104,21 +104,24 @@ class CLI:
             return ' (use tab to help yourself):'
         return ''
 
+    def input(self):
+        return input(self.prompt).rstrip()
+
     def ask(self, question, possibilities=None):
         plist = self.possibilities_list(possibilities)
         self.say(question + plist)
         if possibilities:
             def completer(text, state):
-                return [x for x in possibilities if x.upper().startswith(text.upper())][state]
+                return [x for x in possibilities if x.upper().startswith(text.upper())][state] + ' '
         else:
             completer = None
         readline.set_completer(completer)
         try:
-            ret = input(self.prompt)
+            ret = self.input()
             while (possibilities and ret not in possibilities) or not ret:
                 if ret:
                     self.error('Invalid option!' + plist)
-                ret = input(self.prompt)
+                ret = self.input()
         except EOFError:
             self.exit()
         return ret
@@ -128,11 +131,11 @@ class CLI:
         self.say(question + plist)
         readline.set_completer(None)
         try:
-            ret = input(self.prompt)
+            ret = self.input()
             while ret and ret.lower() not in ['y', 'n']:
                 if ret:
                     self.error('Invalid option!' + plist)
-                ret = input(self.prompt)
+                ret = self.input()
         except EOFError:
             self.exit()
         return ret.lower() != 'n'

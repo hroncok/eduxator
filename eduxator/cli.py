@@ -21,7 +21,23 @@ class CLI:
             readline.read_history_file(self.histfile)
         except FileNotFoundError:
             pass
-        readline.parse_and_bind('tab: complete')
+
+        for item in ['tab: complete',
+                     '"\\C-l": clear-screen',
+                     'set show-all-if-ambiguous on',
+                     '"\\C-o": tab-insert',
+                     '"\\C-r": reverse-search-history',
+                     '"\\C-s": forward-search-history',
+                     '"\\C-p": history-search-backward',
+                     '"\\C-n": history-search-forward',
+                     '"\\e[A": history-search-backward',
+                     '"\\e[B": history-search-forward',
+                     '"\\C-k": kill-line',
+                     '"\\C-u": unix-line-discard']:
+            readline.parse_and_bind(item)
+
+        # Do not treat dash as delimiter in tab completion
+        readline.set_completer_delims(readline.get_completer_delims().replace('-', ''))
 
     def cookie_setup(self):
         try:

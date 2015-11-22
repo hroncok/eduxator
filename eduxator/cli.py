@@ -105,8 +105,10 @@ class CLI:
             tree = tree[one]
         return classpath
 
-    def exit(self):
+    def exit(self, say=False):
         readline.write_history_file(self.histfile)
+        if say:
+            print('exit')
         sys.exit(0)
 
     def say(self, msg):
@@ -147,7 +149,7 @@ class CLI:
                     self.error('Invalid option!' + plist)
                 ret = self.input()
         except EOFError:
-            self.exit()
+            self.exit(say=True)
         return ret
 
     def ask_bool(self, question):
@@ -161,5 +163,5 @@ class CLI:
                     self.error('Invalid option!' + plist)
                 ret = self.input()
         except EOFError:
-            self.exit()
+            self.exit(say=True)
         return ret.lower() != 'n'

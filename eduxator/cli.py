@@ -56,17 +56,19 @@ class CLI:
                 self.eduxio.save_cookie()
 
     def context_setup(self):
+        self.asked = False
         args = list(set(sys.argv[1:]))
         self.eduxio.course = self.determine_course(args)
         self.eduxio.classpath = self.determine_classpath(args)
         self.column = self.determine_column(args)
         self.prompt = '[{}{}{}{}]> '.format(colorama.Fore.BLUE, colorama.Style.BRIGHT,
                                             self.column, colorama.Style.RESET_ALL)
-        self.info('All set. Hint: Use the following command to start eduxator '
-                  'with the same context:')
-        self.info('\n    eduxator {} {} {}\n'.format(self.eduxio.course,
-                                                     ' '.join(self.eduxio.classpath),
-                                                     self.column))
+        if self.asked:
+            self.info('All set. Hint: Use the following command to start eduxator '
+                      'with the same context:')
+            self.info('\n    eduxator {} {} {}\n'.format(self.eduxio.course,
+                                                         ' '.join(self.eduxio.classpath),
+                                                         self.column))
 
     def find_candidates(self, args, possibilities, case_sentitive=False):
         if len(possibilities) == 1:
@@ -169,6 +171,7 @@ class CLI:
             return ''
 
     def ask(self, question, possibilities=None):
+        self.asked = True
         plist = self.possibilities_list(possibilities)
         self.question(question + plist)
         if possibilities:

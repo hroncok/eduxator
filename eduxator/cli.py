@@ -103,7 +103,7 @@ class CLI:
 
     def determine_column(self, args):
         data = self.eduxio.parse_form_edit_score()
-        columns = self.eduxio.all_columns(data)
+        columns = tuple(self.eduxio.all_columns(data))
         candidates = self.find_candidates(args, columns)
         if not candidates:
             return self.ask('What column do you want?', columns)

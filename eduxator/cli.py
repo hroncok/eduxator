@@ -60,7 +60,8 @@ class CLI:
         self.eduxio.course = self.determine_course(args)
         self.eduxio.classpath = self.determine_classpath(args)
         self.column = self.determine_column(args)
-        self.prompt = '[{}]> '.format(self.column)
+        self.prompt = '[{}{}{}{}]> '.format(colorama.Fore.BLUE, colorama.Style.BRIGHT,
+                                            self.column, colorama.Style.RESET_ALL)
 
     def find_candidates(self, args, possibilities, case_sentitive=False):
         if len(possibilities) == 1:

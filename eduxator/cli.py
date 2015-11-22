@@ -131,7 +131,11 @@ class CLI:
         return ''
 
     def input(self):
-        return input(self.prompt).rstrip()
+        try:
+            return input(self.prompt).rstrip()
+        except KeyboardInterrupt:
+            print('^C')
+            return ''
 
     def ask(self, question, possibilities=None):
         plist = self.possibilities_list(possibilities)

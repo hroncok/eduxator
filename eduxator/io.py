@@ -86,6 +86,8 @@ class EduxIO:
 
         classification = EDUX + COURSES + course + CLASSIFICATION
         r = self.get(classification + 'start')
+        # link is HTML are without EDUX address
+        classification = '/' + COURSES + course + CLASSIFICATION
         strings = tuple(x[len(classification):] for x in
                         set(re.findall(classification + r'[^ <"\?#]*', r.text))
                         if not x.startswith(classification + 'start') and not x.endswith('start')

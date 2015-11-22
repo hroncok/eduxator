@@ -62,6 +62,11 @@ class CLI:
         self.column = self.determine_column(args)
         self.prompt = '[{}{}{}{}]> '.format(colorama.Fore.BLUE, colorama.Style.BRIGHT,
                                             self.column, colorama.Style.RESET_ALL)
+        self.info('All set. Hint: Use the following command to start eduxator '
+                  'with the same context:')
+        self.info('\n    eduxator {} {} {}\n'.format(self.eduxio.course,
+                                                     ' '.join(self.eduxio.classpath),
+                                                     self.column))
 
     def find_candidates(self, args, possibilities, case_sentitive=False):
         if len(possibilities) == 1:

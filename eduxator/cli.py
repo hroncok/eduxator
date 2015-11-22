@@ -175,8 +175,7 @@ class CLI:
         plist = self.possibilities_list(possibilities)
         self.question(question + plist)
         if possibilities:
-            def completer(text, state):
-                return [x for x in possibilities if x.upper().startswith(text.upper())][state] + ' '
+            completer = BufferAwareCompleter(possibilities).complete
         else:
             completer = None
         readline.set_completer(completer)
@@ -203,3 +202,61 @@ class CLI:
         except EOFError:
             self.exit(say=True)
         return ret.lower() != 'n'
+
+
+class BufferAwareCompleter:
+    '''
+    Buffer aware completer for tab tompletion
+
+    See: https://pymotw.com/2/readline/
+    Copyright Doug Hellmann, All Rights Reserved
+    Originally published under BSD license
+    '''
+    def __init__(self, options):
+        if isinstance(options, dict):
+            self.options = options
+        else:
+            self.options = {}
+            for option in options:
+                self.options[option] = []
+        self.current_candidates = []
+
+    def complete(self, text, state):
+        response = None
+        if state == 0:
+            # This is the first time for this text, so build a match list.
+            origline = readline.get_line_buffer()
+            begin = readline.get_begidx()
+            end = readline.get_endidx()
+            being_completed = origline[begin:end]
+            words = origline.split()
+
+            if not words:
+                self.current_candidates = sorted(self.options.keys())
+            else:
+                try:
+                    if begin == 0:
+                        # first word
+                        candidates = self.options.keys()
+                    else:
+                        # later word
+                        first = words[0]
+                        candidates = self.options[first]
+
+                    if being_completed:
+                        # match options with portion of input
+                        # being completed
+                        self.current_candidates = [w + ' ' for w in candidates
+                                                   if w.upper().startswith(being_completed.upper())]
+                    else:
+                        # matching empty string so use all candidates
+                        self.current_candidates = candidates
+
+                except (KeyError, IndexError):
+                    self.current_candidates = []
+
+        try:
+            response = self.current_candidates[state]
+        except IndexError:
+            response = None
+        return response

@@ -9,17 +9,18 @@ class CLI:
     prompt = '> '
 
     def __init__(self):
-        self.history_setup()
+        self.readline_setup()
         self.cookie_setup()
         self.context_setup()
         self.exit()
 
-    def history_setup(self):
+    def readline_setup(self):
         self.histfile = os.path.join(os.path.expanduser('~'), '.eduxator_history')
         try:
             readline.read_history_file(self.histfile)
         except FileNotFoundError:
             pass
+        readline.parse_and_bind('tab: complete')
 
     def cookie_setup(self):
         try:

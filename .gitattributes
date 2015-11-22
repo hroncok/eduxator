@@ -1,0 +1,3 @@
+# This makes the large HTML files used for testing
+# not visible to the GitHub language statistics
+test/files/*.html linguist-vendored

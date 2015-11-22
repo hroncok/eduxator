@@ -30,6 +30,8 @@ class TestEduxIO():
         data = e.parse_form_edit_score()
         for key, value in self.good_data('form').items():
             assert data[key] == value
+        assert io.EduxIO.all_usernames(data) == set(self.good_data('usernames'))
+        assert io.EduxIO.all_columns(data) == set(self.good_data('columns'))
 
     def test_sending_form(self):
         url = 'https://edux.fit.cvut.cz/courses/BI-3DT/classification/view/fulltime/tutorials/3'

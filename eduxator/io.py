@@ -147,3 +147,24 @@ class EduxIO:
     def submit_form_edit_score(self, data):
         url = self.construct_form_url()
         return self.post(url, data)
+
+    @classmethod
+    def parse_form_key(cls, key):
+        return tuple(x[:-1] for x in key.split('[')[1:])
+
+    @classmethod
+    def all_of_index(cls, data, index):
+        results = set()
+        for key in data.keys():
+            triplet = cls.parse_form_key(key)
+            if len(triplet) == 3:
+                results.add(triplet[index])
+        return results
+
+    @classmethod
+    def all_usernames(cls, data):
+        return cls.all_of_index(data, 0)
+
+    @classmethod
+    def all_columns(cls, data):
+        return cls.all_of_index(data, 2)

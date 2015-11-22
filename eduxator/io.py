@@ -88,7 +88,8 @@ class EduxIO:
         r = self.get(classification + 'start')
         strings = tuple(x[len(classification):] for x in
                         set(re.findall(classification + r'[^ <"\?#]*', r.text))
-                        if not x.startswith(classification + 'start') and not x.endswith('start'))
+                        if not x.startswith(classification + 'start') and not x.endswith('start')
+                        and not x.endswith('void'))
 
         tree = {}
         for string in strings:

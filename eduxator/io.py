@@ -47,7 +47,7 @@ class EduxIO:
 
     def get(self, url):
         r = requests.get(url, cookies=self.cookies)
-        self.cookies = r.cookies.get_dict()
+        self.cookies.update(r.cookies.get_dict())
 
         # Hear about return codes, Edux?
         if ('id="nepovolena_akce"' in r.text or
